@@ -240,7 +240,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch                        = contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) ? null : false
   assign_ipv6_address_on_creation                = (contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) || can(local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]]) || try(var.subnets[split("/", each.key)[0]].assign_ipv6_cidr, false) || can(var.subnets[split("/", each.key)[0]].ipv6_cidrs)) ? true : try(var.subnets[split("/", each.key)[0]].assign_ipv6_address_on_creation, false)
   enable_dns64                                   = (contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) || can(local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]]) || try(var.subnets[split("/", each.key)[0]].assign_ipv6_cidr, false) || can(var.subnets[split("/", each.key)[0]].ipv6_cidrs)) ? true : false
-  enable_resource_name_dns_aaaa_record_on_launch = contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) ? true : try(var.subnets[split("/", each.key)[0]].enable_resource_name_dns_aaaa_record_on_launch, false)
+  enable_resource_name_dns_aaaa_record_on_launch = (contains(local.subnets_with_ipv6_native, split("/", each.key)[0]) || can(local.calculated_subnets_ipv6[split("/", each.key)[0]][split("/", each.key)[1]]) || try(var.subnets[split("/", each.key)[0]].assign_ipv6_cidr, false) || can(var.subnets[split("/", each.key)[0]].ipv6_cidrs)) ? true : try(var.subnets[split("/", each.key)[0]].enable_resource_name_dns_aaaa_record_on_launch, false)
 
   tags = merge(
     { Name = "${local.subnet_names[split("/", each.key)[0]]}-${split("/", each.key)[1]}" },
