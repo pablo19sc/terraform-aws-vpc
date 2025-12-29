@@ -485,9 +485,13 @@ resource "aws_networkmanager_vpc_attachment" "cwan" {
   subnet_arns     = values(aws_subnet.cwan)[*].arn
   vpc_arn         = local.vpc.arn
 
+  routing_policy_label = try(var.subnets.core_network.routing_policy_label, null)
+
   options {
-    ipv6_support           = local.cwan_dualstack ? true : false
-    appliance_mode_support = try(var.subnets.core_network.appliance_mode_support, false)
+    ipv6_support                       = local.cwan_dualstack ? true : false
+    appliance_mode_support             = try(var.subnets.core_network.appliance_mode_support, false)
+    dns_support                        = try(var.subnets.core_network.dns_support, false)
+    security_group_referencing_support = try(var.subnets.core_network.security_group_referencing_support, true)
   }
 
   tags = merge(

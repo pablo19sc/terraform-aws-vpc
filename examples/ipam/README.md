@@ -8,7 +8,7 @@ This example builds a VPC with a CIDR block from AWS IPAM. It builds public and 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.27.0 |
 
 ## Providers
 

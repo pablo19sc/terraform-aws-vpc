@@ -141,10 +141,13 @@ variable "subnets" {
 
   **core_network subnet type options:**
   - All shared keys abovce
-  - `connect_to_public_natgw` = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
-  - `appliance_mode_support`  = (Optional|bool) Indicates whether appliance mode is supported. If enabled, traffic flow between a source and destination use the same Availability Zone for the VPC attachment for the lifetime of that flow. Defaults to `false`.
-  - `require_acceptance`      = (Optional|bool) Boolean whether the core network VPC attachment to create requires acceptance or not. Defaults to `false`.
-  - `accept_attachment`       = (Optional|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
+  - `connect_to_public_natgw`            = (Optional|string) Determines if routes to NAT Gateways should be created. Specify the CIDR range or a prefix-list-id that you want routed to nat gateway. Usually `0.0.0.0/0`. Must also set `var.subnets.public.nat_gateway_configuration`.
+  - `appliance_mode_support`             = (Optional|bool) Indicates whether appliance mode is supported. If enabled, traffic flow between a source and destination use the same Availability Zone for the VPC attachment for the lifetime of that flow. Defaults to `false`.
+  - `dns_support`                        = (Optional|bool) Whether to enable DNS support. If the VPC attachment is pending acceptance, changing this value will recreate the resource. Defaults to `false`.
+  - `security_group_referencing_support` = (Optional|bool) Whether to enable security group referencing support for this VPC attachment. If the VPC attachment is pending acceptance, changing this value will recreate the resource. Defaults to `true`.
+  - `routing_policy_label`               = (Optional|string) The routing policy label to apply to the VPC attachment for traffic routing decisions. Maximum length of 256 characters. Changing this value will force recreation of the resource.
+  - `require_acceptance`                 = (Optional|bool) Whether to enable appliance mode support. If enabled, traffic flow between a source and destination use the same Availability Zone for the VPC attachment for the lifetime of that flow. If the VPC attachment is pending acceptance, changing this value will recreate the resource. Defaults to `false`.
+  - `accept_attachment`                  = (Optional|bool) Boolean whether the core network VPC attachment is accepted or not in the segment. Only valid if `require_acceptance` is set to `true`. Defaults to `true`.
 
   Example:
   ```
@@ -176,12 +179,15 @@ variable "subnets" {
     }
     # Core Network subnets (dual-stack)
     core_network = {
-      netmask                 = 24
-      assign_ipv6_cidr        = true
-      connect_to_public_natgw = true
-      appliance_mode_support  = true
-      require_acceptance      = true
-      accept_attachment       = true
+      netmask                            = 24
+      assign_ipv6_cidr                   = true
+      routing_policy_label               = "vpcAttachment"
+      connect_to_public_natgw            = true
+      appliance_mode_support             = true
+      dns_support                        = true
+      security_group_referencing_support = false
+      require_acceptance                 = true
+      accept_attachment                  = true
     }
   }
   ```
@@ -226,7 +232,7 @@ EOF
 
   # All var.subnets.core_network valid keys
   validation {
-    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"appliance_mode_support\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
+    error_message = "Invalid key in core_network subnets. Valid options include: \"cidrs\", \"netmask\", \"name_prefix\", \"connect_to_public_natgw\", \"assign_ipv6_cidr\", \"ipv6_cidrs\", \"appliance_mode_support\", \"dns_support\", \"security_group_referencing_support\", \"routing_policy_label\", \"require_acceptance\", \"accept_attachment\", \"tags\"."
     condition = length(setsubtract(keys(try(var.subnets.core_network, {})), [
       "cidrs",
       "netmask",
@@ -235,6 +241,9 @@ EOF
       "assign_ipv6_cidr",
       "ipv6_cidrs",
       "appliance_mode_support",
+      "dns_support",
+      "security_group_referencing_support",
+      "routing_policy_label",
       "require_acceptance",
       "accept_attachment",
       "tags"
